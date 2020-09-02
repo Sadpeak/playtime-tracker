@@ -1,5 +1,8 @@
 #include <sourcemod>
 
+#pragma semicolon 1
+#pragma newdecls required
+
 public Plugin myinfo = {
 	name = "playtime tracker",
 	author = "Sadpeak",
@@ -41,14 +44,15 @@ void OnDBConnected(Database database, const char[] error, any data) {
   g_iState = CONNECTED;
   g_hDatabase = database;
 
-  database.Query(OnTableCreated, "CREATE TABLE IF NOT EXISTS `testing_pt` (\
+  database.Query(OnTableCreated, "CREATE TABLE IF NOT EXISTS `testing_pt1` (\
     `id` int(16) NOT NULL PRIMARY KEY AUTO_INCREMENT, \
     `steamid` varchar(24) NOT NULL, \
     `name` varchar(64) NOT NULL DEFAULT 'unknown', \
     `start` int(16) UNSIGNED NOT NULL, \
     `end` int(16) UNSIGNED NOT NULL, \
     `flags` int(16) UNSIGNED NOT NULL DEFAULT 0, \
-    `ip` varchar(32) NOT NULL DEFAULT 'unknown' \
+    `ip` varchar(32) NOT NULL DEFAULT 'unknown', \
+    `serverip` varchar(32) NOT NULL \
     ) DEFAULT CHARSET = utf8mb4;");
 }
 
@@ -71,4 +75,32 @@ public void CharsetHandler(Database database, DBResultSet result, const char[] e
 
 public void OnPluginStart() {
 	CreateDBConnection();
+}
+
+
+public void OnClientDisconnect(int client) {
+	
+	if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client) || GetClientTime(client) < 120.0 /*|| g_iTime[client] == -1*/)return;
+	
+	char sQuery[256], sAuth[32], name[64], ip[33], serverIp[65], name2[128];
+	//int start, end;
+	int flags = GetUserFlagBits(client);
+	GetClientName(client, name, 64);
+	GetClientIP(client, ip, sizeof(ip));
+	GetClientAuthId(client, AuthId_Steam2, sAuth, sizeof(sAuth));
+	
+	ConVar gameIP = FindConVar("ip");
+	GetConVarString(gameIP, serverIp, 32);
+	
+	
+	g_hDatabase.Escape(name, name2, sizeof(name2));
+	PrintToServer("client time is %d", RoundToZero(GetClientTime(client)));
+	FormatEx(sQuery, sizeof(sQuery), "INSERT INTO `testing_pt1`(steamid, name, start, end, flags, ip, serverIp) \
+			VALUES('%s', '%s',  %d,  %d,  %d, '%s', '%s'); ", sAuth, name2, GetTime() - RoundToZero(GetClientTime(client)), GetTime(), flags, ip, serverIp);
+	g_hDatabase.Query(SQLT_OnClientDisconnect, sQuery);
+}
+
+
+public void SQLT_OnClientDisconnect(Handle hOwner, Handle hQuery, const char[] sError, any iUserId) {
+	if (!hQuery)LogError("SQLT_OnClientDisconnect: %s", sError);
 }
