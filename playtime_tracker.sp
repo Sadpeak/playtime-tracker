@@ -7,3 +7,68 @@ public Plugin myinfo = {
 	version = "0.1",
 	url = "http://steamcommunity.com/id/sadpeak"
 };
+
+enum {
+  NONE = 0,
+ 	CONNECTING,
+ 	CONNECTED,
+ 	ERROR
+}
+
+int g_iState;
+Database g_hDatabase;
+
+
+void CreateDBConnection() {
+  if (g_iState == CONNECTING || g_iState == CONNECTED) return;
+
+  g_iState = CONNECTING;
+  if (SQL_CheckConfig("testing")) {
+    Database.Connect(OnDBConnected, "testing");
+  } else {
+    
+    g_iState = ERROR;
+  }
+}
+
+void OnDBConnected(Database database, const char[] error, any data) {
+  if (!database || error[0]) {
+    SetFailState("[SM] Sessions.OnDBConnect: %s", error);
+    g_iState = ERROR;
+    return;
+  }
+
+  g_iState = CONNECTED;
+  g_hDatabase = database;
+
+  database.Query(OnTableCreated, "CREATE TABLE IF NOT EXISTS `testing_pt` (\
+    `id` int(16) NOT NULL PRIMARY KEY AUTO_INCREMENT, \
+    `steamid` varchar(24) NOT NULL, \
+    `name` varchar(64) NOT NULL DEFAULT 'unknown', \
+    `start` int(16) UNSIGNED NOT NULL, \
+    `end` int(16) UNSIGNED NOT NULL, \
+    `flags` int(16) UNSIGNED NOT NULL DEFAULT 0, \
+    `ip` varchar(32) NOT NULL DEFAULT 'unknown' \
+    ) DEFAULT CHARSET = utf8mb4;");
+}
+
+public void OnTableCreated(Database database, DBResultSet result, const char[] error, any data) {
+  if (!database || error[0]) {
+    SetFailState("[SM] OnTableCreate %s", error);
+    g_iState = ERROR;
+    return;
+  }
+
+  database.Query(CharsetHandler, "SET NAMES 'utf8mb4'");
+  database.Query(CharsetHandler, "SET CHARSET 'utf8mb4'");
+  database.SetCharset("utf8mb4");
+
+}
+
+public void CharsetHandler(Database database, DBResultSet result, const char[] error, any data) {
+	if (error[0]) LogError("[SM] CharsetSet: %s", error);
+}
+
+public void OnPluginStart() {
+	CreateDBConnection();
+}
