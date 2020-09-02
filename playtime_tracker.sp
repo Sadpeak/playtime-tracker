@@ -44,8 +44,7 @@ void OnDBConnected(Database database, const char[] error, any data) {
   g_iState = CONNECTED;
   g_hDatabase = database;
 
-  database.Query(OnTableCreated, "CREATE TABLE IF NOT EXISTS `testing_pt1` (\
-    `id` int(16) NOT NULL PRIMARY KEY AUTO_INCREMENT, \
+  database.Query(OnTableCreated, "CREATE TABLE IF NOT EXISTS `playtime_tracker` (\
     `steamid` varchar(24) NOT NULL, \
     `name` varchar(64) NOT NULL DEFAULT 'unknown', \
     `start` int(16) UNSIGNED NOT NULL, \
@@ -80,10 +79,9 @@ public void OnPluginStart() {
 
 public void OnClientDisconnect(int client) {
 	
-	if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client) || GetClientTime(client) < 120.0 /*|| g_iTime[client] == -1*/)return;
+	if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client) || GetClientTime(client) < 120.0 
 	
 	char sQuery[256], sAuth[32], name[64], ip[33], serverIp[65], name2[128];
-	//int start, end;
 	int flags = GetUserFlagBits(client);
 	GetClientName(client, name, 64);
 	GetClientIP(client, ip, sizeof(ip));
@@ -95,7 +93,7 @@ public void OnClientDisconnect(int client) {
 	
 	g_hDatabase.Escape(name, name2, sizeof(name2));
 	PrintToServer("client time is %d", RoundToZero(GetClientTime(client)));
-	FormatEx(sQuery, sizeof(sQuery), "INSERT INTO `testing_pt1`(steamid, name, start, end, flags, ip, serverIp) \
+	FormatEx(sQuery, sizeof(sQuery), "INSERT INTO `playtime_tracker`(steamid, name, start, end, flags, ip, serverIp) \
 			VALUES('%s', '%s',  %d,  %d,  %d, '%s', '%s'); ", sAuth, name2, GetTime() - RoundToZero(GetClientTime(client)), GetTime(), flags, ip, serverIp);
 	g_hDatabase.Query(SQLT_OnClientDisconnect, sQuery);
 }
