@@ -26,8 +26,8 @@ void CreateDBConnection() {
   if (g_iState == CONNECTING || g_iState == CONNECTED) return;
 
   g_iState = CONNECTING;
-  if (SQL_CheckConfig("testing")) {
-    Database.Connect(OnDBConnected, "testing");
+  if (SQL_CheckConfig("playtime")) {
+    Database.Connect(OnDBConnected, "playtime");
   } else {
     
     g_iState = ERROR;
@@ -78,8 +78,7 @@ public void OnPluginStart() {
 
 
 public void OnClientDisconnect(int client) {
-	
-	if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client) || GetClientTime(client) < 120.0 
+	if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client) || GetClientTime(client) < 120.0) return;
 	
 	char sQuery[256], sAuth[32], name[64], ip[33], serverIp[65], name2[128];
 	int flags = GetUserFlagBits(client);
@@ -89,13 +88,12 @@ public void OnClientDisconnect(int client) {
 	
 	ConVar gameIP = FindConVar("ip");
 	GetConVarString(gameIP, serverIp, 32);
-	
-	
+  
 	g_hDatabase.Escape(name, name2, sizeof(name2));
-	PrintToServer("client time is %d", RoundToZero(GetClientTime(client)));
 	FormatEx(sQuery, sizeof(sQuery), "INSERT INTO `playtime_tracker`(steamid, name, start, end, flags, ip, serverIp) \
 			VALUES('%s', '%s',  %d,  %d,  %d, '%s', '%s'); ", sAuth, name2, GetTime() - RoundToZero(GetClientTime(client)), GetTime(), flags, ip, serverIp);
 	g_hDatabase.Query(SQLT_OnClientDisconnect, sQuery);
+  
 }
 
 
