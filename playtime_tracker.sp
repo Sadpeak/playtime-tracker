@@ -47,10 +47,10 @@ void OnDBConnected(Database database, const char[] error, any data) {
   database.Query(OnTableCreated, "CREATE TABLE IF NOT EXISTS `playtime_tracker` (\
     `steamid` varchar(24) NOT NULL, \
     `name` varchar(64) NOT NULL DEFAULT 'unknown', \
-    `start` int(16) UNSIGNED NOT NULL, \
-    `end` int(16) UNSIGNED NOT NULL, \
+    `start` int(11) UNSIGNED NOT NULL, \
+    `end` int(11) UNSIGNED NOT NULL, \
     `flags` int(16) UNSIGNED NOT NULL DEFAULT 0, \
-    `ip` varchar(32) NOT NULL DEFAULT 'unknown', \
+    `ip` varchar(48) NOT NULL DEFAULT 'unknown', \
     `serverip` varchar(32) NOT NULL \
     ) DEFAULT CHARSET = utf8mb4;");
 }
@@ -80,18 +80,23 @@ public void OnPluginStart() {
 public void OnClientDisconnect(int client) {
 	if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client) || GetClientTime(client) < 120.0) return;
 	
-	char sQuery[256], sAuth[32], name[64], ip[33], serverIp[65], name2[128];
+	char sQuery[256], sAuth[32], name[64], ip[33], serverIP[64], name2[128], serverPort[16], serIpPort[92];
 	int flags = GetUserFlagBits(client);
 	GetClientName(client, name, 64);
 	GetClientIP(client, ip, sizeof(ip));
 	GetClientAuthId(client, AuthId_Steam2, sAuth, sizeof(sAuth));
 	
-	ConVar gameIP = FindConVar("ip");
-	GetConVarString(gameIP, serverIp, 32);
-  
+  ConVar gameIP = FindConVar("ip");
+  ConVar gamePort = FindConVar("hostport");
+  GetConVarString(gameIP, serverIP, 32);
+  GetConVarString(gamePort, serverPort, 32);
+
+  FormatEx(serIpPort, sizeof(serIpPort), "%s:%s", serverIP, serverPort);
+
+
 	g_hDatabase.Escape(name, name2, sizeof(name2));
 	FormatEx(sQuery, sizeof(sQuery), "INSERT INTO `playtime_tracker`(steamid, name, start, end, flags, ip, serverIp) \
-			VALUES('%s', '%s',  %d,  %d,  %d, '%s', '%s'); ", sAuth, name2, GetTime() - RoundToZero(GetClientTime(client)), GetTime(), flags, ip, serverIp);
+			VALUES('%s', '%s',  %d,  %d,  %d, '%s', '%s'); ", sAuth, name2, GetTime() - RoundToZero(GetClientTime(client)), GetTime(), flags, ip, serIpPort);
 	g_hDatabase.Query(SQLT_OnClientDisconnect, sQuery);
   
 }
