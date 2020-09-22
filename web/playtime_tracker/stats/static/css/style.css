@@ -1,0 +1,156 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+body {
+	background: #222226;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.sidebar {
+	/* height: 300px; */
+	width: 20%;
+	display: inline-block;
+}
+.servers {
+	background: #333336;
+	color: #E5E5E5;
+	font-style: italic;
+	font-weight: 500;
+	font-size: 48px;
+	text-align: center;
+	border: #E5E5E5 4px solid;
+}
+.servers a {
+	padding-top: 15px;
+	display: block;
+	
+}
+a:link {
+    text-decoration: none;
+    color: #E5E5E5;
+}
+a:visited {
+	color: #E5E5E5;
+}
+
+a::after {
+	display: block;
+	content: '';
+	width: 100%;
+	height: 4px;
+	background: #E5E5E5;
+	margin-top: 25px;
+}
+h3::after {
+	display: block;
+	content: '';
+	width: 100%+20px;
+	height: 4px;
+	background: #E5E5E5;
+	margin-top: 25px;
+	margin-left: -30px;
+}
+
+.filters {
+	border: #E5E5E5 4px solid;
+	margin-top: 35px;
+	background: #333336;
+	padding-left: 30px;
+	color: #E5E5E5;
+	padding-bottom: 35px;
+}
+
+.filters p {
+	font-size: 22px;
+	display: inline-block;
+	padding-top: 20px;
+
+}
+h3 {
+	padding-top: 35px;
+	color: #E5E5E5;
+	font-style: italic;
+	font-weight: 500;
+	font-size: 48px;
+	text-align: center;
+}
+select {
+	display: block;
+	margin-top: 10px;
+	background: #222226;
+	color:#E5E5E5;
+}
+
+.container {
+	float:right;
+	background:#333336;
+	width: 79%;
+}
+
+.search {
+	margin-top: 20px;
+	height: 55px;
+	width: 98%;
+	background: #444446;
+	display: inline-block;
+	margin-left: 1%;
+}
+.search::after {
+	display: block;
+	content: 'Поиск по нику, steamid, группе...';
+	width: 100%;
+	margin-top: 55px;
+	color: #D7D2D4;
+}
+
+.stats {
+	margin: 1%;
+	margin-top: 30px;
+	color: #D7D2D4
+}
+
+table, th, td {
+	border: 3px solid #D7D2D4;
+	padding: 10px;
+}

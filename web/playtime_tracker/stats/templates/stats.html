@@ -1,12 +1,74 @@
+<!--{% load static %}-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{ server }}</title>
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet"> 
 </head>
 <body>
-	<h1>{{ server }}</h1>
-	<a href="{% url 'home_stats' %}">back</a>
+<!--	<h1>{{ server }}</h1>
+	<a href="{% url 'home_stats' %}">back</a> -->
+	<div class="sidebar">
+		<div class="servers">
+			<a href="#" class="">All</a>
+			<a href="#" class="">Arena</a>
+			<a href="#" class="">Public</a>
+			<a href="#" class="">Awp</a>
+		</div>
+		<div class="filters">
+			<h3>Фильтр</h3>
+			
+			<div><input type="checkbox" name="simplePlayer" id="simplePlayer"> <p>Обычные игроки</p></div>
+			<div><input type="checkbox" name="mod" id="mod"> <p>Модераторы</p></div>
+			<div><input type="checkbox" name="admin" id="admin"> <p>Администраторы</p></div>
+			<div><input type="checkbox" name="adminPlus" id="adminPlus"> <p>Гл. админы и выше</p></div>
+
+			<div class="period">
+			<p>Показать за</p>
+			<select name="period" id="period">
+				<option value="1">day</option>
+				<option value="2">week</option>
+				<option value="3">mounth</option>
+			</select>
+			</div>
+			<div class="sort">
+			<p>Сортировать по</p>
+			<select name="period" id="period">
+				<option value="1">этому</option>
+				<option value="2">Тому</option>
+				<option value="3">Сему</option>
+			</select>
+			</div>
+		</div>
+	</div><div class="container">
+		<div class="search"></div>
+		<div class="stats">
+			<table style="width:100%">
+				<tr>
+					<th>Никнейм</th>
+					<th>steam id</th>
+					<th>Статус</th>
+					<th>Онлайн общий</th>
+					<th>Онлайн за день</th>
+					<th>Онлайн за неделю</th>
+					<th>Онлайн за месяц</th>
+					<th>кол-во сессий</th>
+				</tr>
+				<tr>
+					<th>Sadpeak</th>
+					<th>STEAM_1:0:14352512</th>
+					<th>Admin</th>
+					<th>88:88:88</th>
+					<th>55:55:55</th>
+					<th>44:44:44</th>
+					<th>33:33:33</th>
+					<th>325</th>
+				</tr>
+				</table> 
+		</div>
+	</div>
 </body>
 </html>
