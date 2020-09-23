@@ -30,9 +30,9 @@ def get_flag_str(flags):
     alf, s = 'abcdefghijklmnzopqrst', ''
     for i in range(len(alf)):
         if flags & (2 ** i):
-            print(i, alf[i])
+            # print(i, alf[i])
             s += alf[i]
-    print(s)
+    # print(s)
     return s
 
 
@@ -57,18 +57,25 @@ def stats_all(request):
     assert connection, "Connection failed"
 
     cursor = connection.cursor()
-
+    context = {'stats': []}
     # query = ("SELECT steamid, GROUP_CONCAT(DISTINCT name), SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC LIMIT 10")
     queryAll = (
-        "SELECT steamid, name, SUM(end - start) AS total FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
+        "SELECT steamid, name, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
     queryDay = ("SELECT steamid, SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC")
     queryWeek = ("SELECT steamid, SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) GROUP BY steamid ORDER BY total DESC")
     queryMONTH = ("SELECT steamid, SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)) GROUP BY steamid ORDER BY total DESC")
 
     cursor.execute(queryAll)
 
-    for (steamid, name, total) in cursor:
-        pass
+    for (steamid, name, total, sessions, flags) in cursor:
+        context['stats'].append({
+            'steamid': steamid,
+            'name': name,
+            'timeAll': get_time(total),
+            'sessions': sessions,
+            'flags': get_flag_str(flags),
+            'url': steamid_to_commid(steamid),
+        })
     cursor.close()
     connection.close()
-    return render(request, 'stats.html', {'server': 'all'})
+    return render(request, 'stats.html', context)

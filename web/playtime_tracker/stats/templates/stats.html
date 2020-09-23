@@ -57,16 +57,19 @@
 					<th>Онлайн за месяц</th>
 					<th>кол-во сессий</th>
 				</tr>
-				<tr>
-					<th>Sadpeak</th>
-					<th>STEAM_1:0:14352512</th>
-					<th>Admin</th>
-					<th>88:88:88</th>
-					<th>55:55:55</th>
-					<th>44:44:44</th>
-					<th>33:33:33</th>
-					<th>325</th>
-				</tr>
+				{% for stat in stats %}
+					<tr>
+						<th><a href="https://steamcommunity.com/profiles/{{ stat.url }}">{{ stat.name }}</a></th>
+						<th>{{ stat.steamid }}</th>
+						<th>{{ stat.flags }}</th>
+						<th>{{ stat.timeAll }}</th>
+						<th>55:55:55</th>
+						<th>44:44:44</th>
+						<th>33:33:33</th>
+						<th>{{ stat.sessions }}</th>
+					</tr>
+				{% endfor %}
+				
 				</table> 
 		</div>
 	</div>

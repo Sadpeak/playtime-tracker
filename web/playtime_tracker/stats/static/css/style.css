@@ -43,12 +43,12 @@ table {
 }
 
 body {
-	background: #222226;
+	background: #222222;
 	font-family: 'Montserrat', sans-serif;
 }
 
 .sidebar {
-	/* height: 300px; */
+	/* height: 300px; */ 
 	width: 20%;
 	display: inline-block;
 }
@@ -74,7 +74,7 @@ a:visited {
 	color: #E5E5E5;
 }
 
-a::after {
+.servers a::after {
 	display: block;
 	content: '';
 	width: 100%;
