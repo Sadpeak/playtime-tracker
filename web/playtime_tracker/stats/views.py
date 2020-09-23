@@ -5,7 +5,9 @@ import os
 import mysql.connector
 
 # 'http://steamcommunity.com/profiles/' + str(steamid_to_commid('STEAM_0:0:158483103'))
-
+# list = []
+# tuple = ()
+# dict = {}
 database = {
     'host': os.getenv("DB_HOST"),
     'user': os.getenv("DB_USER"),
@@ -53,22 +55,33 @@ def stats_awp(request):
 
 
 def stats_all(request):
+    return stats('all', request)
+
+
+def stats(server, request):
     connection = mysql.connector.connect(**database)
     assert connection, "Connection failed"
 
     cursor = connection.cursor()
+    cursor2 = connection.cursor()
+    cursor3 = connection.cursor()
+    cursor4 = connection.cursor()
     context = {'stats': []}
+    statsAll = []
+    statsDay = []
+    statsWeek = []
+    statsMonth = []
     # query = ("SELECT steamid, GROUP_CONCAT(DISTINCT name), SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC LIMIT 10")
     queryAll = (
         "SELECT steamid, name, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
-    queryDay = ("SELECT steamid, SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC")
-    queryWeek = ("SELECT steamid, SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) GROUP BY steamid ORDER BY total DESC")
-    queryMONTH = ("SELECT steamid, SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)) GROUP BY steamid ORDER BY total DESC")
+    queryDay = ("SELECT steamid, SUM(end - start) AS totalDay FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY totalDay DESC")
+    queryWeek = ("SELECT steamid, SUM(end - start) AS totalWeek FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) GROUP BY steamid ORDER BY totalWeek DESC")
+    queryMonth = ("SELECT steamid, SUM(end - start) AS totalMonth FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)) GROUP BY steamid ORDER BY totalMonth DESC")
 
     cursor.execute(queryAll)
 
     for (steamid, name, total, sessions, flags) in cursor:
-        context['stats'].append({
+        statsAll.append({
             'steamid': steamid,
             'name': name,
             'timeAll': get_time(total),
@@ -77,5 +90,43 @@ def stats_all(request):
             'url': steamid_to_commid(steamid),
         })
     cursor.close()
+
+    cursor2.execute(queryDay)
+
+    for (steamid, totalDay) in cursor2:
+        statsDay.append({
+            'timeDay': get_time(totalDay),
+        })
+    cursor2.close()
+
+    cursor3.execute(queryWeek)
+
+    for (steamid, totalWeek) in cursor3:
+        statsWeek.append({
+            'timeWeek': get_time(totalWeek),
+        })
+    cursor3.close()
+
+    cursor4.execute(queryMonth)
+
+    for (steamid, totalMonth) in cursor4:
+        statsMonth.append({
+            'timeMonth': get_time(totalMonth),
+        })
+    cursor4.close()
+
+    for a, d, w, m in zip(statsAll, statsDay, statsWeek, statsMonth):
+        context['stats'].append({
+            'steamid': a['steamid'],
+            'name': a['name'],
+            'timeAll': a['timeAll'],
+            'sessions': a['sessions'],
+            'flags': a['flags'],
+            'url': a['steamid'],
+            'timeDay': d['timeDay'],
+            'timeWeek': w['timeWeek'],
+            'timeMonth': m['timeMonth']
+        })
     connection.close()
+    context['server'] = server
     return render(request, 'stats.html', context)

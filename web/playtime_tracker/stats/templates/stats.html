@@ -13,10 +13,10 @@
 	<a href="{% url 'home_stats' %}">back</a> -->
 	<div class="sidebar">
 		<div class="servers">
-			<a href="#" class="">All</a>
-			<a href="#" class="">Arena</a>
-			<a href="#" class="">Public</a>
-			<a href="#" class="">Awp</a>
+			<a href="{% url 'stats_all' %}" class="">All</a>
+			<a href="{% url 'stats_arena' %}" class="">Arena</a>
+			<a href="{% url 'stats_public' %}" class="">Public</a>
+			<a href="{% url 'stats_awp' %}" class="">Awp</a>
 		</div>
 		<div class="filters">
 			<h3>Фильтр</h3>
@@ -59,13 +59,13 @@
 				</tr>
 				{% for stat in stats %}
 					<tr>
-						<th><a href="https://steamcommunity.com/profiles/{{ stat.url }}">{{ stat.name }}</a></th>
+						<th><a href="https://steamcommunity.com/profiles/{{ stat.url }}" target="_blank">{{ stat.name }}</a></th>
 						<th>{{ stat.steamid }}</th>
 						<th>{{ stat.flags }}</th>
 						<th>{{ stat.timeAll }}</th>
-						<th>55:55:55</th>
-						<th>44:44:44</th>
-						<th>33:33:33</th>
+						<th>{{ stat.timeDay }}</th>
+						<th>{{ stat.timeWeek }}</th>
+						<th>{{ stat.timeMonth }}</th>
 						<th>{{ stat.sessions }}</th>
 					</tr>
 				{% endfor %}
