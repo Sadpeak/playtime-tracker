@@ -48,20 +48,31 @@ def get_role(flags):
     return 'Игрок'
 
 
+def get_ip(server):
+    if server == 'public':
+        return os.getenv("IP_PUBLIC")
+    if server == 'awp':
+        return os.getenv("IP_AWP")
+    if server == 'arena':
+        return os.getenv("IP_ARENA")
+    if server == 'all':
+        return ' '
+
+
 def home_stats(request):
     return render(request, 'stats_home.html')
 
 
 def stats_arena(request):
-    return render(request, 'stats.html', {'server': 'arena'})
+    return stats('arena', request)
 
 
 def stats_public(request):
-    return render(request, 'stats.html', {'server': 'public'})
+    return stats('public', request)
 
 
 def stats_awp(request):
-    return render(request, 'stats.html', {'server': 'awp'})
+    return stats('awp', request)
 
 
 def stats_all(request):
@@ -80,12 +91,16 @@ def stats(server, request):
     statsAll, statsDay, statsWeek, statsMonth = [], [], [], []
     # query = ("SELECT steamid, GROUP_CONCAT(DISTINCT name), SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC LIMIT 10")
     queryAll = (
-        "SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR '\n') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
-    queryDay = ("SELECT steamid, SUM(end - start) AS totalDay FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY totalDay DESC")
-    queryWeek = ("SELECT steamid, SUM(end - start) AS totalWeek FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) GROUP BY steamid ORDER BY totalWeek DESC")
-    queryMonth = ("SELECT steamid, SUM(end - start) AS totalMonth FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)) GROUP BY steamid ORDER BY totalMonth DESC")
+        "SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR '\n') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` {} {} GROUP BY steamid ORDER BY total DESC")
+    queryDay = ("SELECT steamid, SUM(end - start) AS totalDay FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) {} {} GROUP BY steamid ORDER BY totalDay DESC")
+    queryWeek = ("SELECT steamid, SUM(end - start) AS totalWeek FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) {} {}GROUP BY steamid ORDER BY totalWeek DESC")
+    queryMonth = ("SELECT steamid, SUM(end - start) AS totalMonth FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 MONTH)) {} {} GROUP BY steamid ORDER BY totalMonth DESC")
 
-    cursor.execute(queryAll)
+    whichServer = "serverip='{}'".format(get_ip(server))
+    if server == 'all':
+        cursor.execute(queryAll.format(' ', ' '))
+    else:
+        cursor.execute(queryAll.format('WHERE', whichServer))
 
     for (steamid, name, names, total, sessions, flags) in cursor:
         statsAll.append({
@@ -100,7 +115,10 @@ def stats(server, request):
         })
     cursor.close()
 
-    cursor2.execute(queryDay)
+    if server == 'all':
+        cursor2.execute(queryDay.format(' ', ' '))
+    else:
+        cursor2.execute(queryDay.format('AND', whichServer))
 
     for (steamid, totalDay) in cursor2:
         statsDay.append({
@@ -108,7 +126,10 @@ def stats(server, request):
         })
     cursor2.close()
 
-    cursor3.execute(queryWeek)
+    if server == 'all':
+        cursor3.execute(queryWeek.format(' ', ' '))
+    else:
+        cursor3.execute(queryWeek.format('AND', whichServer))
 
     for (steamid, totalWeek) in cursor3:
         statsWeek.append({
@@ -116,7 +137,10 @@ def stats(server, request):
         })
     cursor3.close()
 
-    cursor4.execute(queryMonth)
+    if server == 'all':
+        cursor4.execute(queryMonth.format(' ', ' '))
+    else:
+        cursor4.execute(queryMonth.format('AND', whichServer))
 
     for (steamid, totalMonth) in cursor4:
         statsMonth.append({
