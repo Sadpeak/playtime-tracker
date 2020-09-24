@@ -133,15 +133,10 @@ select {
 	height: 55px;
 	width: 98%;
 	background: #444446;
+	color: #fff;
+	font-size: 22px;
 	display: inline-block;
 	margin-left: 1%;
-}
-.search::after {
-	display: block;
-	content: 'Поиск по нику, steamid, группе...';
-	width: 100%;
-	margin-top: 55px;
-	color: #D7D2D4;
 }
 
 .stats {
@@ -153,4 +148,8 @@ select {
 table, th, td {
 	border: 3px solid #D7D2D4;
 	padding: 10px;
+}
+
+.btn-submit {
+	margin-top: 25px;
 }
