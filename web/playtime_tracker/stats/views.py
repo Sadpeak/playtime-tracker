@@ -38,6 +38,18 @@ def get_flag_str(flags):
     return s
 
 
+def get_role(flags):
+    if flags & 16384:
+        return 'Основатель'
+    if flags & 1064960:
+        return 'Гл.Администратор'
+    if flags & 131072:
+        return 'Модератор'
+    if flags & 2:
+        return 'Администратор'
+    return 'Игрок'
+
+
 def home_stats(request):
     return render(request, 'stats_home.html')
 
@@ -67,10 +79,7 @@ def stats(server, request):
     cursor3 = connection.cursor()
     cursor4 = connection.cursor()
     context = {'stats': []}
-    statsAll = []
-    statsDay = []
-    statsWeek = []
-    statsMonth = []
+    statsAll, statsDay, statsWeek, statsMonth = [], [], [], []
     # query = ("SELECT steamid, GROUP_CONCAT(DISTINCT name), SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC LIMIT 10")
     queryAll = (
         "SELECT steamid, name, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
@@ -88,6 +97,7 @@ def stats(server, request):
             'sessions': sessions,
             'flags': get_flag_str(flags),
             'url': steamid_to_commid(steamid),
+            'role': get_role(flags),
         })
     cursor.close()
 
@@ -122,10 +132,11 @@ def stats(server, request):
             'timeAll': a['timeAll'],
             'sessions': a['sessions'],
             'flags': a['flags'],
-            'url': a['steamid'],
+            'url': a['url'],
             'timeDay': d['timeDay'],
             'timeWeek': w['timeWeek'],
-            'timeMonth': m['timeMonth']
+            'timeMonth': m['timeMonth'],
+            'role': a['role'],
         })
     connection.close()
     context['server'] = server

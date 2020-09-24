@@ -50,7 +50,7 @@
 				<tr>
 					<th>Никнейм</th>
 					<th>steam id</th>
-					<th>Статус</th>
+					<th>Роль</th>
 					<th>Онлайн общий</th>
 					<th>Онлайн за день</th>
 					<th>Онлайн за неделю</th>
@@ -61,7 +61,7 @@
 					<tr>
 						<th><a href="https://steamcommunity.com/profiles/{{ stat.url }}" target="_blank">{{ stat.name }}</a></th>
 						<th>{{ stat.steamid }}</th>
-						<th>{{ stat.flags }}</th>
+						<th title="{{ stat.flags }}">{{ stat.role }}</th>
 						<th>{{ stat.timeAll }}</th>
 						<th>{{ stat.timeDay }}</th>
 						<th>{{ stat.timeWeek }}</th>
