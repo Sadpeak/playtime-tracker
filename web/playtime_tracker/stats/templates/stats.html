@@ -59,7 +59,7 @@
 				</tr>
 				{% for stat in stats %}
 					<tr>
-						<th><a href="https://steamcommunity.com/profiles/{{ stat.url }}" target="_blank">{{ stat.name }}</a></th>
+						<th title="{{ stat.names }}"><a href="https://steamcommunity.com/profiles/{{ stat.url }}" target="_blank">{{ stat.name }}</a></th>
 						<th>{{ stat.steamid }}</th>
 						<th title="{{ stat.flags }}">{{ stat.role }}</th>
 						<th>{{ stat.timeAll }}</th>

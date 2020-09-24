@@ -41,8 +41,6 @@ def get_flag_str(flags):
 def get_role(flags):
     if flags & 16384:
         return 'Основатель'
-    if flags & 1064960:
-        return 'Гл.Администратор'
     if flags & 131072:
         return 'Модератор'
     if flags & 2:
@@ -82,17 +80,18 @@ def stats(server, request):
     statsAll, statsDay, statsWeek, statsMonth = [], [], [], []
     # query = ("SELECT steamid, GROUP_CONCAT(DISTINCT name), SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC LIMIT 10")
     queryAll = (
-        "SELECT steamid, name, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
+        "SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR '\n') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` GROUP BY steamid ORDER BY total DESC")
     queryDay = ("SELECT steamid, SUM(end - start) AS totalDay FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY totalDay DESC")
     queryWeek = ("SELECT steamid, SUM(end - start) AS totalWeek FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) GROUP BY steamid ORDER BY totalWeek DESC")
     queryMonth = ("SELECT steamid, SUM(end - start) AS totalMonth FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)) GROUP BY steamid ORDER BY totalMonth DESC")
 
     cursor.execute(queryAll)
 
-    for (steamid, name, total, sessions, flags) in cursor:
+    for (steamid, name, names, total, sessions, flags) in cursor:
         statsAll.append({
             'steamid': steamid,
             'name': name,
+            'names': names,
             'timeAll': get_time(total),
             'sessions': sessions,
             'flags': get_flag_str(flags),
@@ -129,6 +128,7 @@ def stats(server, request):
         context['stats'].append({
             'steamid': a['steamid'],
             'name': a['name'],
+            'names': a['names'],
             'timeAll': a['timeAll'],
             'sessions': a['sessions'],
             'flags': a['flags'],
