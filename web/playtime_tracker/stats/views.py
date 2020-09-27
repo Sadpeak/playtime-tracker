@@ -4,10 +4,7 @@ from .steam import steamid_to_commid
 import os
 import mysql.connector
 
-# 'http://steamcommunity.com/profiles/' + str(steamid_to_commid('STEAM_0:0:158483103'))
-# list = []
-# tuple = ()
-# dict = {}
+
 database = {
     'host': os.getenv("DB_HOST"),
     'user': os.getenv("DB_USER"),
@@ -32,9 +29,7 @@ def get_flag_str(flags):
     alf, s = 'abcdefghijklmnzopqrst', ''
     for i in range(len(alf)):
         if flags & (2 ** i):
-            # print(i, alf[i])
             s += alf[i]
-    # print(s)
     return s
 
 
@@ -89,11 +84,10 @@ def stats(server, request):
     cursor4 = connection.cursor()
     context = {'stats': []}
     statsAll, statsDay, statsWeek, statsMonth = [], [], [], []
-    # query = ("SELECT steamid, GROUP_CONCAT(DISTINCT name), SUM(end - start) AS total FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) GROUP BY steamid ORDER BY total DESC LIMIT 10")
     queryAll = (
         "SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR '\n') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` {} {} GROUP BY steamid ORDER BY total DESC")
     queryDay = ("SELECT steamid, SUM(end - start) AS totalDay FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) {} {} GROUP BY steamid ORDER BY totalDay DESC")
-    queryWeek = ("SELECT steamid, SUM(end - start) AS totalWeek FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) {} {}GROUP BY steamid ORDER BY totalWeek DESC")
+    queryWeek = ("SELECT steamid, SUM(end - start) AS totalWeek FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 WEEK)) {} {} GROUP BY steamid ORDER BY totalWeek DESC")
     queryMonth = ("SELECT steamid, SUM(end - start) AS totalMonth FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 MONTH)) {} {} GROUP BY steamid ORDER BY totalMonth DESC")
 
     whichServer = "serverip='{}'".format(get_ip(server))
@@ -122,6 +116,7 @@ def stats(server, request):
 
     for (steamid, totalDay) in cursor2:
         statsDay.append({
+            'steamid': steamid,
             'timeDay': get_time(totalDay),
         })
     cursor2.close()
@@ -133,6 +128,7 @@ def stats(server, request):
 
     for (steamid, totalWeek) in cursor3:
         statsWeek.append({
+            'steamid': steamid,
             'timeWeek': get_time(totalWeek),
         })
     cursor3.close()
@@ -144,11 +140,12 @@ def stats(server, request):
 
     for (steamid, totalMonth) in cursor4:
         statsMonth.append({
+            'steamid': steamid,
             'timeMonth': get_time(totalMonth),
         })
     cursor4.close()
 
-    for a, d, w, m in zip(statsAll, statsDay, statsWeek, statsMonth):
+    for idx, (a, d, w, m) in enumerate(zip(statsAll, statsDay, statsWeek, statsMonth)):
         context['stats'].append({
             'steamid': a['steamid'],
             'name': a['name'],
@@ -157,11 +154,17 @@ def stats(server, request):
             'sessions': a['sessions'],
             'flags': a['flags'],
             'url': a['url'],
-            'timeDay': d['timeDay'],
-            'timeWeek': w['timeWeek'],
-            'timeMonth': m['timeMonth'],
             'role': a['role'],
         })
+        for val in statsDay:
+            if val['steamid'] == context['stats'][idx]['steamid']:
+                context['stats'][idx]['timeDay'] = val['timeDay']
+        for val in statsWeek:
+            if val['steamid'] == context['stats'][idx]['steamid']:
+                context['stats'][idx]['timeWeek'] = val['timeWeek']
+        for val in statsMonth:
+            if val['steamid'] == context['stats'][idx]['steamid']:
+                context['stats'][idx]['timeMonth'] = val['timeMonth']
     connection.close()
     context['server'] = server
     return render(request, 'stats.html', context)

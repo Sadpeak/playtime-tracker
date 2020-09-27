@@ -59,9 +59,9 @@
 						<th>{{ stat.steamid }}</th>
 						<th title="{{ stat.flags }}">{{ stat.role }}</th>
 						<th>{{ stat.timeAll }}</th>
-						<th>{{ stat.timeDay }}</th>
-						<th>{{ stat.timeWeek }}</th>
-						<th>{{ stat.timeMonth }}</th>
+						<th>{{ stat.timeDay }}{% if not stat.timeDay %}none{% endif %}</th>
+						<th>{{ stat.timeWeek }}{% if not stat.timeWeek %}none{% endif %}</th>
+						<th>{{ stat.timeMonth }}{% if not stat.timeMonth %}none{% endif %}</th>
 						<th>{{ stat.sessions }}</th>
 					</tr>
 				{% endfor %}
