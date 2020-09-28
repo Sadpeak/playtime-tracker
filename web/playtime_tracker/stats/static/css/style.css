@@ -153,3 +153,14 @@ table, th, td {
 .btn-submit {
 	margin-top: 25px;
 }
+
+.nav-link{
+	display: block;
+	font-weight: bold;
+	font-style: italic;
+}
+
+.role {
+	margin-bottom: 15px;
+	font-weight: bold;
+}

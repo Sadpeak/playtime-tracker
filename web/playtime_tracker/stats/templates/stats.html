@@ -22,16 +22,16 @@
 			<h3>Фильтр</h3>
 			
 			<div style="padding: 10px 20px">
-                Роль
+                <p class="role">Роль:</p>
                 <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
                     {% for role in roles %}
-                        <a class="nav-link {{ role.class }}" href="?role={{ role.key }}">{{ role.text }}</a>
+                        <a class="nav-link {{ role.class }}" href="?role={{ role.key }}">{{ role.text }}</a><br>
                     {% endfor %}
                 </div>
             </div>
 
 			<div class="sort">
-			<p>Сортировать по</p>
+			<p>Сортировать по <br>(не работает)</p>
 			<select name="period">
 				<option value="1">Общему времени</option>
 				<option value="2">Тому</option>
@@ -41,7 +41,7 @@
 		</div>
 		
 	</div><div class="container">
-		<input class="search" placeholder="Поиск по нику, steamid, группе..."></input>
+		<input class="search" placeholder="Поиск по нику, steamid, группе... (Ctrl + F поиск:D)"></input>
 		<div class="stats">
 			<table style="width:100%">
 				<tr>
