@@ -19,24 +19,25 @@
 			<a href="{% url 'stats_awp' %}" class="">Awp</a>
 		</div>
 		<div class="filters">
-		<form method="POST" action="">
-		{% csrf_token %}
 			<h3>Фильтр</h3>
 			
-			<div><input type="checkbox" name="role" value="simplePlayer"> <p>Обычные игроки</p></div>
-			<div><input type="checkbox" name="role" value="mod"> <p>Модераторы</p></div>
-			<div><input type="checkbox" name="role" value="admin"> <p>Администраторы</p></div>
+			<div style="padding: 10px 20px">
+                Роль
+                <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                    {% for role in roles %}
+                        <a class="nav-link {{ role.class }}" href="?role={{ role.key }}">{{ role.text }}</a>
+                    {% endfor %}
+                </div>
+            </div>
 
 			<div class="sort">
 			<p>Сортировать по</p>
-			<select name="period" id="period">
+			<select name="period">
 				<option value="1">Общему времени</option>
 				<option value="2">Тому</option>
 				<option value="3">Сему</option>
 			</select>
 			</div>
-			<button class="btn-submit" type="submit">Применить фильтр</button>
-			</form>
 		</div>
 		
 	</div><div class="container">
@@ -59,9 +60,9 @@
 						<th>{{ stat.steamid }}</th>
 						<th title="{{ stat.flags }}">{{ stat.role }}</th>
 						<th>{{ stat.timeAll }}</th>
-						<th>{{ stat.timeDay }}{% if not stat.timeDay %}none{% endif %}</th>
-						<th>{{ stat.timeWeek }}{% if not stat.timeWeek %}none{% endif %}</th>
-						<th>{{ stat.timeMonth }}{% if not stat.timeMonth %}none{% endif %}</th>
+						<th>{{ stat.timeDay }}</th>
+						<th>{{ stat.timeWeek }}</th>
+						<th>{{ stat.timeMonth }}</th>
 						<th>{{ stat.sessions }}</th>
 					</tr>
 				{% endfor %}

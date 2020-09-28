@@ -12,6 +12,10 @@ database = {
     'db': os.getenv("DB_NAME"),
 }
 
+filters = {
+    'admin': lambda flags: flags & 1064962,
+    'moder': lambda flags: flags & 131072,
+}
 
 def get_time(seconds):
     h = seconds // 3600
@@ -75,6 +79,8 @@ def stats_all(request):
 
 
 def stats(server, request):
+    role_key = request.GET.get('role', 'all')
+
     connection = mysql.connector.connect(**database)
     assert connection, "Connection failed"
 
@@ -84,6 +90,22 @@ def stats(server, request):
     cursor4 = connection.cursor()
     context = {'stats': []}
     statsAll, statsDay, statsWeek, statsMonth = [], [], [], []
+
+    def online_day(steamid):
+        for val in statsDay:
+            if val['steamid'] == steamid:
+                return val['timeDay']
+
+    def online_week(steamid):
+        for val in statsWeek:
+            if val['steamid'] == steamid:
+                return val['timeWeek']
+
+    def online_month(steamid):
+        for val in statsMonth:
+            if val['steamid'] == steamid:
+                return val['timeMonth']
+    
     queryAll = (
         "SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR '\n') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, flags FROM `playtime_tracker` {} {} GROUP BY steamid ORDER BY total DESC")
     queryDay = ("SELECT steamid, SUM(end - start) AS totalDay FROM `playtime_tracker` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)) {} {} GROUP BY steamid ORDER BY totalDay DESC")
@@ -101,9 +123,9 @@ def stats(server, request):
             'steamid': steamid,
             'name': name,
             'names': names,
-            'timeAll': get_time(total),
+            'timeAll': total,
             'sessions': sessions,
-            'flags': get_flag_str(flags),
+            'flags': flags,
             'url': steamid_to_commid(steamid),
             'role': get_role(flags),
         })
@@ -145,26 +167,37 @@ def stats(server, request):
         })
     cursor4.close()
 
+    context['roles'] = [
+        {'key': 'all', 'text': 'Все', 'class': 'active' if role_key == 'all' else ''},
+        {'key': 'moder', 'text': 'Модератор',
+            'class': 'active' if role_key == 'moder' else ''},
+        {'key': 'admin', 'text': 'Администратор',
+            'class': 'active' if role_key == 'admin' else ''}
+    ]
+
+    filter_f = filters.get(role_key)
+
     for idx, (a, d, w, m) in enumerate(zip(statsAll, statsDay, statsWeek, statsMonth)):
-        context['stats'].append({
-            'steamid': a['steamid'],
-            'name': a['name'],
-            'names': a['names'],
-            'timeAll': a['timeAll'],
-            'sessions': a['sessions'],
-            'flags': a['flags'],
-            'url': a['url'],
-            'role': a['role'],
-        })
-        for val in statsDay:
-            if val['steamid'] == context['stats'][idx]['steamid']:
-                context['stats'][idx]['timeDay'] = val['timeDay']
-        for val in statsWeek:
-            if val['steamid'] == context['stats'][idx]['steamid']:
-                context['stats'][idx]['timeWeek'] = val['timeWeek']
-        for val in statsMonth:
-            if val['steamid'] == context['stats'][idx]['steamid']:
-                context['stats'][idx]['timeMonth'] = val['timeMonth']
+
+        if filter_f is None or filter_f(a['flags']):
+
+            if a['flags'] & 2 == 0 and a['timeAll'] < 3600:
+                continue
+
+            context['stats'].append({
+                'steamid': a['steamid'],
+                'name': a['name'],
+                'names': a['names'],
+                'timeAll': get_time(a['timeAll']),
+                'sessions': a['sessions'],
+                'flags': get_flag_str(a['flags']),
+                'url': a['url'],
+                'role': a['role'],
+                'timeDay': online_day(a['steamid']),
+                'timeWeek': online_week(a['steamid']),
+                'timeMonth': online_month(a['steamid']),
+            })
+
     connection.close()
     context['server'] = server
     return render(request, 'stats.html', context)
