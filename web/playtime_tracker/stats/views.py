@@ -177,25 +177,25 @@ def stats(server, request):
 
     filter_f = filters.get(role_key)
 
-    for idx, (a, d, w, m) in enumerate(zip(statsAll, statsDay, statsWeek, statsMonth)):
+    for stat in statsAll:
 
-        if filter_f is None or filter_f(a['flags']):
+        if filter_f is None or filter_f(stat['flags']):
 
-            if a['flags'] & 2 == 0 and a['timeAll'] < 3600:
+            if stat['flags'] & 2 == 0 and stat['timeAll'] < 3600:
                 continue
 
             context['stats'].append({
-                'steamid': a['steamid'],
-                'name': a['name'],
-                'names': a['names'],
-                'timeAll': get_time(a['timeAll']),
-                'sessions': a['sessions'],
-                'flags': get_flag_str(a['flags']),
-                'url': a['url'],
-                'role': a['role'],
-                'timeDay': online_day(a['steamid']),
-                'timeWeek': online_week(a['steamid']),
-                'timeMonth': online_month(a['steamid']),
+                'steamid': stat['steamid'],
+                'name': stat['name'],
+                'names': stat['names'],
+                'timeAll': get_time(stat['timeAll']),
+                'sessions': stat['sessions'],
+                'flags': get_flag_str(stat['flags']),
+                'url': stat['url'],
+                'role': stat['role'],
+                'timeDay': online_day(stat['steamid']),
+                'timeWeek': online_week(stat['steamid']),
+                'timeMonth': online_month(stat['steamid']),
             })
 
     connection.close()
