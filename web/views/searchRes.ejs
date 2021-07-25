@@ -15,24 +15,66 @@
    <div style="display:flex;justify-content:center;align-items:center;margin-top:150px">
       <div>
 
-         <h1><%= res.name %> </h1>
-         <p><strong>Общее наиграное время:</strong> <%= res.total %> </p>
-         <p><strong>Наиграное время за месяц:</strong> <%= res.totalMonth %> </p>
-         <p><strong>Наиграное время за неделю:</strong> <%= res.totalWeek %> </p>
-         <p><strong>Наиграное время за день:</strong> <%= res.totalDay %> </p>
-         <p><strong>Кол-во Сессий:</strong> <%= res.sessions %> </p>
-         <p><strong>Флаги:</strong> <%= res.flags %> </p>
-         <p><strong>SteamID:</strong> <%= res.steamid %> </p>
+         <h1 style="display: inline-block;">
+            <%= res.name %>
+         </h1>
+         <span class="namehistory_link" id="nameHistory_click">
+            <img id="getnamehistory_arrow"
+               src="https://community.cloudflare.steamstatic.com/public/images/skin_1/arrowDn9x5.gif" width="20"
+               height="20" border="0">
+         </span>
+         <div id="NamePopup" class="popup_block_new"
+            style="visibility: visible; top: 35px; left: 100.933px; display: none; opacity: 1;">
+            <div class="popup_body popup_menu">
+               <div>Также играл под другими никами:</div>
+               <div id="NamePopupAliases">
+                  <hr>
+                  <%= res.names %>
+                     <hr>
+               </div>
+               <div style="clear:both"></div>
+            </div>
+         </div>
+         <p><strong>Общее наиграное время:</strong>
+            <%= res.total %>
+         </p>
+         <p><strong>Наиграное время за месяц:</strong>
+            <%= res.totalMonth %>
+         </p>
+         <p><strong>Наиграное время за неделю:</strong>
+            <%= res.totalWeek %>
+         </p>
+         <p><strong>Наиграное время за день:</strong>
+            <%= res.totalDay %>
+         </p>
+         <p><strong>Кол-во Сессий:</strong>
+            <%= res.sessions %>
+         </p>
+         <p><strong>Флаги:</strong>
+            <%= res.flags %>
+         </p>
+         <p><strong>SteamID:</strong>
+            <%= res.steamid %>
+         </p>
          <a href="<%= res.steamLink %>">Линк на стим</a>
 
       </div>
    </div>
 
 
+   <script>
+      const historyArrow = document.getElementById('nameHistory_click')
+      const namesBlock = document.getElementById('NamePopup')
 
+      historyArrow.addEventListener('click', () => {
+         console.log()
+         if (getComputedStyle(namesBlock).display == "none")
+            namesBlock.style.display = "block";
+         else
+            namesBlock.style.display = "none";
+      })
+   </script>
 </body>
-<style>
 
-</style>
 
 </html>
