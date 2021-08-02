@@ -27,10 +27,12 @@ app.get('/search', (req, res) => {
    res.render('search')
 
    if(req.query.steamid){
-   const querryT = `SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR ' | ') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, GROUP_CONCAT(DISTINCT flags SEPARATOR '|') AS flags FROM \`playtime_tracker\` WHERE steamid = "${req.query.steamid}"`
-   const querryD = `SELECT SUM(end - start) AS totalDay FROM \`playtime_tracker\` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 DAY)) AND steamid = "${req.query.steamid}"`
-   const querryW = `SELECT SUM(end - start) AS totalWeek FROM \`playtime_tracker\` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 WEEK)) AND steamid = "${req.query.steamid}"`
-   const querryM = `SELECT SUM(end - start) AS totalMonth FROM \`playtime_tracker\` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 MONTH)) AND steamid = "${req.query.steamid}"`
+   const reqSteamid = req.query.steamid.replace('STEAM_0', 'STEAM_1')
+   
+   const querryT = `SELECT steamid, name, GROUP_CONCAT(DISTINCT name SEPARATOR ' | ') AS names, SUM(end - start) AS total, COUNT(*) AS sessions, GROUP_CONCAT(DISTINCT flags SEPARATOR '|') AS flags FROM \`playtime_tracker\` WHERE steamid = "${reqSteamid}"`
+   const querryD = `SELECT SUM(end - start) AS totalDay FROM \`playtime_tracker\` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 DAY)) AND steamid = "${reqSteamid}"`
+   const querryW = `SELECT SUM(end - start) AS totalWeek FROM \`playtime_tracker\` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 WEEK)) AND steamid = "${reqSteamid}"`
+   const querryM = `SELECT SUM(end - start) AS totalMonth FROM \`playtime_tracker\` WHERE start > UNIX_TIMESTAMP(DATE_SUB(CURRENT_TIMESTAMP , INTERVAL 1 MONTH)) AND steamid = "${reqSteamid}"`
    
    let stats = {}
 
