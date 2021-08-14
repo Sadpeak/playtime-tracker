@@ -17,7 +17,12 @@
             <label for="steamid" class="form-label h3">Введите SteamID</label>
             <input name="steamid" id="steamid" placeholder="STEAM_1:0:12345" class="form-control"
                style="margin: 15px 0; width: 250px;">
-         
+            <select class="form-select"  style="margin-bottom: 20px" name="server">
+               <option selected value="">По всем серверам</option>
+               <option value="awp" id="awp">Awp</option>
+               <option value="public" id="public">Public</option>
+               <option value="arena" id="arena">Arena</option>
+            </select>
             <button type="submit" class="btn btn-primary">Submit</button>
          </form>
 
