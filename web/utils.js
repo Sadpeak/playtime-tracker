@@ -5,6 +5,10 @@ const timeConverter = (time) => {
    timeH = Math.trunc(time/3600)
    timeM = Math.trunc((time - timeH*3600)/60)
    timeS = time - timeH*3600 - timeM*60
+   
+   timeH < 10 ? timeH = "0" + timeH : 1
+   timeM < 10 ? timeM = "0" + timeM : 1
+   timeS < 10 ? timeS = "0" + timeS : 1
 
    return timeH +':'+ timeM +':'+ timeS
 }
